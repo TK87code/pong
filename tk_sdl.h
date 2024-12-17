@@ -16,6 +16,7 @@
 #define SKYBLUE "3cbcfcff"
 #define LIGHTBLUE "0078f8ff"
 #define BLUE "0000fcff"
+#define RED "a80020ff"
 
 /* === Key IDs === */
 typedef enum tk_key_id{
@@ -23,6 +24,7 @@ typedef enum tk_key_id{
     TK_KEY_DOWN,
     TK_KEY_W,
     TK_KEY_S,
+    TK_KEY_ESC,
 }tk_key_id_t;
 
 /* === App init & destrution === */
@@ -35,6 +37,7 @@ extern int tk_get_window_height(void);
 extern double tk_get_deltatime(void);
 /* === App data setters === */
 extern void tk_set_fps_target(int fps);
+extern void tk_set_should_quit(void);
 /* === Input related === */
 extern bool tk_is_key_down(tk_key_id_t key);
 /* === Drawing functions === */

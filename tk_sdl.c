@@ -6,6 +6,7 @@ typedef struct key_state{
     bool key_down;
     bool key_w;
     bool key_s;
+    bool key_esc;
 }key_state_t;
 
 typedef struct app{
@@ -88,6 +89,7 @@ static void _set_key_state(SDL_Scancode scancode, bool is_down){
         case SDL_SCANCODE_DOWN:{ key_state.key_down = is_down; }break;
         case SDL_SCANCODE_W:{ key_state.key_w = is_down; }break;
         case SDL_SCANCODE_S:{ key_state.key_s = is_down; }break;
+        case SDL_SCANCODE_ESCAPE:{ key_state.key_esc = is_down; }break;
         default: { }break;
     }
 }
@@ -129,6 +131,7 @@ bool tk_is_key_down(tk_key_id_t key){
         case TK_KEY_DOWN:{ return key_state.key_down; }break;
         case TK_KEY_W:{ return key_state.key_w; }break;
         case TK_KEY_S:{ return key_state.key_s; }break;
+        case TK_KEY_ESC:{ return key_state.key_esc; }break;
         default: { return 0; }break;
     }
 }
@@ -179,4 +182,9 @@ void tk_end_drawing(void){
 
 void tk_set_fps_target(int fps){
     app.fps_cap = fps;
+}
+
+void tk_set_should_quit(void)
+{
+    app.should_quit = true;
 }
