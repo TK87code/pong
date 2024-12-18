@@ -7,17 +7,19 @@
 #include <stdbool.h>
 
 /* === Colors === */
-#define WHITE "fcfcfcff"
-#define BLACK "000000ff"
-#define PEARL "f8f8f8ff"
-#define LIGHTGRAY "bcbcbcff"
-#define GRAY "7c7c7cff"
-#define PALEBLUE "a4e4fcff"
-#define SKYBLUE "3cbcfcff"
-#define LIGHTBLUE "0078f8ff"
-#define BLUE "0000fcff"
-#define RED "a80020ff"
-#define GREEN "00a800ff"
+#define WHITE "fcfcfc"
+#define BLACK "000000"
+#define PEARL "f8f8f8"
+#define LIGHTGRAY "bcbcbc"
+#define GRAY "7c7c7c"
+#define PALEBLUE "a4e4fc"
+#define SKYBLUE "3cbcfc"
+#define LIGHTBLUE "0078f8"
+#define BLUE "0000fc"
+#define RED "a80020"
+#define GREEN "00a800"
+#define YELLOW "f8b800"
+#define BROWN "503000"
 
 /* === Key IDs === */
 typedef enum tk_key_id{
@@ -44,6 +46,7 @@ extern bool tk_is_key_down(tk_key_id_t key);
 /* === Drawing functions === */
 extern void tk_clear_screen(char *color);
 extern void tk_draw_rect(int x, int y, int w, int h, char *color);
+void tk_draw_rect_a(int x, int y, int w, int h, int alpha, char *color);
 extern void tk_draw_line(int x1, int y1, int x2, int y2, char *color);
 extern void tk_end_drawing(void);
 

@@ -42,6 +42,8 @@ void tk_app_init(char *title, int window_width, int window_height)
                                  window_width, window_height, 0);
     app.renderer = SDL_CreateRenderer(app.window, -1, SDL_RENDERER_ACCELERATED);
     
+    SDL_SetRenderDrawBlendMode(app.renderer,SDL_BLENDMODE_BLEND);
+    
     app.window_width = window_width;
     app.window_height = window_height;
     
@@ -141,7 +143,7 @@ static void _hex_to_rgba(char *hex, int* rgba){
     char tmp[2];
     
     j = 0;
-    for (i = 0; i < 7; i += 2){
+    for (i = 0; i < 5; i += 2){
         tmp[0] = hex[i];
         tmp[1] = hex[i + 1];
         rgba[j] = (int)strtol(tmp, NULL, 16);
@@ -151,25 +153,33 @@ static void _hex_to_rgba(char *hex, int* rgba){
 
 void tk_draw_rect(int x, int y, int w, int h, char *color)
 {
-    int rgba[4];
+    int rgba[3];
     _hex_to_rgba(color, rgba);
-    SDL_SetRenderDrawColor(app.renderer, rgba[0], rgba[1], rgba[2], rgba[3]);
+    SDL_SetRenderDrawColor(app.renderer, rgba[0], rgba[1], rgba[2], 255);
+    SDL_RenderFillRect(app.renderer, &((SDL_Rect){x, y, w, h}));
+}
+
+void tk_draw_rect_a(int x, int y, int w, int h, int alpha, char *color)
+{
+    int rgba[3];
+    _hex_to_rgba(color, rgba);
+    SDL_SetRenderDrawColor(app.renderer, rgba[0], rgba[1], rgba[2], alpha);
     SDL_RenderFillRect(app.renderer, &((SDL_Rect){x, y, w, h}));
 }
 
 void tk_clear_screen(char *color)
 {
-    int rgba[4];
+    int rgba[3];
     _hex_to_rgba(color, rgba);
-    SDL_SetRenderDrawColor(app.renderer, rgba[0], rgba[1], rgba[2], rgba[3]);
+    SDL_SetRenderDrawColor(app.renderer, rgba[0], rgba[1], rgba[2], 255);
     SDL_RenderClear(app.renderer);
 }
 
 void tk_draw_line(int x1, int y1, int x2, int y2, char *color)
 {
-    int rgba[4];
+    int rgba[3];
     _hex_to_rgba(color, rgba);
-    SDL_SetRenderDrawColor(app.renderer, rgba[0], rgba[1], rgba[2], rgba[3]);
+    SDL_SetRenderDrawColor(app.renderer, rgba[0], rgba[1], rgba[2], 255);
     SDL_RenderDrawLine(app.renderer, x1, y1, x2, y2);
 }
 
