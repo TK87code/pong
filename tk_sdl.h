@@ -17,6 +17,7 @@
 #define LIGHTBLUE "0078f8ff"
 #define BLUE "0000fcff"
 #define RED "a80020ff"
+#define GREEN "00a800ff"
 
 /* === Key IDs === */
 typedef enum tk_key_id{
