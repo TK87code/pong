@@ -3,7 +3,8 @@
 #include "tk_collision.h"
 #include "tk_container.h"
 
-#define PADDLE_SPEED 550
+#define PADDLE_SPEED 550.0
+#define INITIAL_BALL_SPEED 500.0
 
 typedef enum game_state{
     COUNTDOWN,
@@ -17,15 +18,14 @@ typedef struct entity{
     int h;
 }entity_t;
 
-void launch_ball(entity_t *ball);
-
 int main(int argc, char *argv[])
 {
-    double dt;
-    double countdown_timer;
-    double projectile_timer = 0.0;
-    game_state_t state = COUNTDOWN;
-    entity_t *projectile;
+    int i, j;                       /* For looping */
+    double projectile_timer = 0.0;  /* For saving projectile pos at fixed seconds */
+    double countdown_timer;         /* For countdown */
+    double dt;                      /* Deltatime */
+    game_state_t state = COUNTDOWN; /* Game State */
+    entity_t *projectile;           /* A container of projectiles */
     
     tkmt_srand();
     
@@ -57,7 +57,6 @@ int main(int argc, char *argv[])
     projectile = (entity_t*)tk_darray_create(sizeof(entity_t));
     
     while (!tk_app_should_quit()){
-        int i, j;
         dt = tk_get_deltatime();
         projectile_timer += dt;
         
@@ -67,7 +66,9 @@ int main(int argc, char *argv[])
             ball.dx = ball.dy = 0.0;
             countdown_timer += dt;
             if (countdown_timer >= 3){
-                launch_ball(&ball);
+                /* Launching a ball */
+                ball.dx = (tkmt_rand(0,1)) ? -1 * INITIAL_BALL_SPEED : INITIAL_BALL_SPEED;
+                ball.dy = tkmt_randf(-150.0, 150.0);
                 state = PLAY;
                 countdown_timer = 0.0;
             }
@@ -95,9 +96,9 @@ int main(int argc, char *argv[])
         p1.y = tkmt_clampf(p1.y + (p1.dy * dt), 0.0, (float)(tk_get_window_height() - p1.h));
         p2.y = tkmt_clampf(p2.y + (p2.dy * dt), 0.0, (float)(tk_get_window_height() - p2.h));
         
-        /* add push old ball position to darray every 0.1 sec */
+        /* add push 15 old ball positions to darray every 0.1 sec */
         if (projectile_timer >= 0.01){
-            if (tk_darray_count(projectile) < 10){
+            if (tk_darray_count(projectile) < 15){
                 tk_darray_push((void**)&projectile, &ball);
             }
             else{
@@ -112,7 +113,7 @@ int main(int argc, char *argv[])
         ball.y += ball.dy * dt;
         ball.x += ball.dx * dt;
         
-        /* Handling collision */
+        /*=== Handling collision ===*/
         /* VS vertical walls */
         if (ball.y < 0 || ball.y + ball.h >= tk_get_window_height()){
             ball.dy *= -1;
@@ -137,50 +138,44 @@ int main(int argc, char *argv[])
                      tk_get_window_width() / 2, tk_get_window_height(), PEARL);
         /* Drawing count down */
         if (state == COUNTDOWN){
+            int i, j;
+            const int middle_w = tk_get_window_width() / 2;
+            const int middle_h = tk_get_window_height() / 2;
+            const int square_size = 15;
             if (countdown_timer > 0 && countdown_timer <= 1){
-                tk_draw_rect(tk_get_window_width() / 2 - (15 / 2) - (15 * 2), 
-                             tk_get_window_height() / 2 + (15 * 2),
-                             15, 15, YELLOW);
-                tk_draw_rect(tk_get_window_width() / 2 - (15 / 2), 
-                             tk_get_window_height() / 2 + (15 * 2),
-                             15, 15, YELLOW);
-                tk_draw_rect(tk_get_window_width() / 2 - (15 / 2) + (15 * 2), 
-                             tk_get_window_height() / 2 + (15 * 2),
-                             15, 15, YELLOW);
+                for (i = 0, j = -1; i < 3; i++, j++){
+                    tk_draw_rect(middle_w - (square_size / 2) + (j * (square_size * 2)), 
+                                 middle_h + (square_size * 2),
+                                 square_size, square_size, GREEN);
+                }
             }
             else if (countdown_timer > 1 && countdown_timer <= 2){
-                tk_draw_rect(tk_get_window_width() / 2 - (15 / 2) - (15 * 2), 
-                             tk_get_window_height() / 2 + (15 * 2),
-                             15, 15, YELLOW);
-                tk_draw_rect(tk_get_window_width() / 2 - (15 / 2), 
-                             tk_get_window_height() / 2 + (15 * 2),
-                             15, 15, YELLOW);
+                for (i = 0, j = -1; i < 2; i++, j++){
+                    tk_draw_rect(middle_w - (square_size / 2) + (j * (square_size * 2)), 
+                                 middle_h + (square_size * 2),
+                                 square_size, square_size, GREEN);
+                }
             }
             else if (countdown_timer > 2 && countdown_timer <= 3){
-                tk_draw_rect(tk_get_window_width() / 2 - (15 / 2) - (15 * 2), 
-                             tk_get_window_height() / 2 + (15 * 2),
-                             15, 15, YELLOW);
+                tk_draw_rect(middle_w - (square_size / 2) - (square_size * 2), 
+                             middle_h + (square_size * 2),
+                             square_size, square_size, GREEN);
             }
         }
         
-        /* Drawing paddle & ball */
+        /* Drawing paddles */
         tk_draw_rect(p1.x, p1.y, p1.w, p1.h, RED);
         tk_draw_rect(p2.x, p2.y, p2.w, p2.h, BLUE);
         /* Drawing projectile */
-        for (i = tk_darray_count(projectile), j = 0; i >= 0 ; i--, j += 25){
-            tk_draw_rect_a(projectile[i].x, projectile[i].y, projectile[i].w - 5, projectile[i].h, 255 - j,LIGHTGRAY);
+        for (i = tk_darray_count(projectile), j = 0; i >= 0 ; i--, j += 5){
+            tk_draw_rect_a(projectile[i].x, projectile[i].y, projectile[i].w - 5, projectile[i].h, 110 - j,WHITE);
         }
-        tk_draw_rect(ball.x, ball.y, ball.w, ball.h, GRAY);
+        /* Drawing a ball */
+        tk_draw_rect(ball.x, ball.y, ball.w, ball.h, WHITE);
         tk_end_drawing();
     }
     
     tk_app_destroy();
     
     return 0;
-}
-
-void launch_ball(entity_t *ball)
-{
-    ball->dx = (tkmt_rand(0,1)) ? -500.0 : 500.0;
-    ball->dy = tkmt_randf(-150.0, 150.0);
 }
